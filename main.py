@@ -23,9 +23,9 @@ async def root():
 @app.post("/colorise")
 async def colorise(image: UploadFile):
     image_data = await image.read()
-    
+
     image_object = Image.open(io.BytesIO(image_data))
     blurred_image = image_object.filter(ImageFilter.GaussianBlur(radius=10))
-    blurred_image.save("newfile.jpeg", "JPEG")
+    blurred_image.save("newfile.jpeg",)
 
     return FileResponse("newfile.jpeg", media_type="image/jpeg")
