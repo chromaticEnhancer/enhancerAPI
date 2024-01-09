@@ -1,7 +1,8 @@
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import shutil
+from fastapi.responses import FileResponse
+from PIL import ImageFilter, Image
+import io
 
 app = FastAPI()
 
@@ -21,4 +22,10 @@ async def root():
 
 @app.post("/colorise")
 async def colorise(image: UploadFile):
-    return {"message": f"{image.filename}"}
+    image_data = await image.read()
+    
+    image_object = Image.open(io.BytesIO(image_data))
+    blurred_image = image_object.filter(ImageFilter.GaussianBlur(radius=10))
+    blurred_image.save("newfile.jpeg", "JPEG")
+
+    return FileResponse("newfile.jpeg", media_type="image/jpeg")
