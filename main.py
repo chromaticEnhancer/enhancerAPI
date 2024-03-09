@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from PIL import ImageFilter, Image
 import io
+import subprocess
+from themodel import colorize as colorizer
+
 
 app = FastAPI()
 
@@ -22,10 +25,16 @@ async def root():
 
 @app.post("/colorise")
 async def colorise(image: UploadFile):
-    image_data = await image.read()
+    
+    with open(f'./images/bw_input.png', 'wb') as img_bw:
+        img_bw.write(image.file.read())
 
-    image_object = Image.open(io.BytesIO(image_data))
-    blurred_image = image_object.filter(ImageFilter.GaussianBlur(radius=10))
-    blurred_image.save("newfile.jpeg",)
+    colorizer('./images/')
 
-    return FileResponse("newfile.jpeg", media_type="image/jpeg")
+    return FileResponse("./images/colored/colored_bw_input.png", media_type="image/png")
+
+
+if __name__== "__main__":
+
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
